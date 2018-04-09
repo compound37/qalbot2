@@ -1,9 +1,30 @@
 import discord
 import argparse
 import logging
+import random
+import simple_tf
 
 logger = logging.getLogger('discord')
 client = discord.Client()
+
+def weighted_select(weighted_list):
+	totalItems = 0
+	totalList = []
+	for i in range(0, len(weighted_list)):
+		totalItems += weighted_list[i][0]
+		for j in range(0, weighted_list[i][0]): totalList.append(weighted_list[i][1])
+
+	return random.choice(totalList)
+
+def tf_parser(parse_msg):
+	parse_words = parse_msg.split()
+	if parse_words[0] == "simple":
+		choice = weighted_select(simple_tf.simple_start)
+		if choice == 'grow_limb': return weighted_select(simple_tf.grow_limb)
+		elif choice == 'grow_genetalia': return weighted_select(simple_tf.grow_genetalia)
+		elif choice == 'grow_tail': return weighted_select(simple_tf.grow_tail)
+		elif choice == 'grow_mutation': return weighted_select(simple_tf.grow_mutation)
+
 
 @client.event
 async def on_message(message):
@@ -12,6 +33,11 @@ async def on_message(message):
 
 	if message.content.startswith("!qb hello"):
 		msg = 'hello {0.author.mention}'.format(message)
+		await client.send_message(message.channel, msg)
+
+	elif message.content.startswith("!qb roll-tf"):
+		result_tf = tf_parser('simple')
+		msg = '{0.author.mention}'.format(message) + result_tf
 		await client.send_message(message.channel, msg)
 
 def main():
